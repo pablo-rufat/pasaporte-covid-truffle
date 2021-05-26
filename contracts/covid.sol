@@ -14,16 +14,13 @@ contract passaporteCovid {
          uint primeiraDose;
          uint segundaDose;
          bool cadastrado;
+         uint docCount;
+         address[] documentos;
      }
 
     struct Administrador {
         bool ativo;
         string cfm;
-    }
-
-    struct Historico {
-       uint primeiraDose;
-       uint segundaDose;
     }
 
     mapping(address => Cidadao) listaCidadao;
@@ -38,8 +35,18 @@ contract passaporteCovid {
          _;
      }
 
+     modifier podeAdicionarDocumento() {
+         require(listaAdministradores[msg.sender].ativo == bool(true), "Voce nao pode adicionar documentos ao historico.");
+         _;
+     }
+
      modifier podeCadastrarAdministrador() {
          require(msg.sender == owner,"Voce nao pode cadastrar um administrador.");
+         _;
+     }
+
+     modifier podeGetDocumentos(address cidadao) {
+         require(listaAdministradores[msg.sender].ativo == bool(true) || uint(msg.sender) == uint(cidadao), "Voce nao pode ver historico.");
          _;
      }
 
@@ -58,19 +65,27 @@ contract passaporteCovid {
          _;
      }
 
-    function cadastrarAdministrador(address admin, string cfm, bool ativo) external podeCadastrarAdministrador(){
-        var newAdmin = Administrador(ativo, cfm);
+    function cadastrarAdministrador(address admin, string calldata cfm, bool ativo) external podeCadastrarAdministrador(){
+        Administrador memory newAdmin = Administrador(ativo, cfm);
         listaAdministradores[admin] = newAdmin;
     }
 
     function cadastrarCidadao(address cidadao) external podeCadastrar(){
-        var newCidadao = Cidadao(0, 0, true);
+        Cidadao memory newCidadao = Cidadao(0, 0, true, 0, new address[](0));
         listaCidadao[cidadao] = newCidadao;
     }
 
-    function getHistorico(address cidadao) external view returns (Historico) {
-        var hist = Historico(listaCidadao[cidadao].primeiraDose, listaCidadao[cidadao].segundaDose);
-        return hist;
+    function addDocumento(address cidadao, address ipfs) external podeAdicionarDocumento() {
+        listaCidadao[cidadao].documentos[listaCidadao[cidadao].docCount] = ipfs;
+        listaCidadao[cidadao].docCount += 1;
+    }
+
+    function getDocumentos(address cidadao) external view podeGetDocumentos(cidadao) returns (address  [] memory) {
+        return listaCidadao[cidadao].documentos;
+    }
+
+    function getHistoricoDatasVacinas(address cidadao) external view returns (uint, uint) {
+        return (listaCidadao[cidadao].primeiraDose, listaCidadao[cidadao].segundaDose);
     }
 
      function aplicarPrimeiraDose(uint timestamp, address cidadao) external podeAplicarPrimeiraDose(cidadao) {
