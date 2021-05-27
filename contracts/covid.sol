@@ -1,6 +1,6 @@
 pragma solidity 0.5.16;
 
-contract passaporteCovid {
+contract covid {
 
     //pessoas que receberam a primeira dose
      uint32 public totalPrimeiraDose;
@@ -50,12 +50,6 @@ contract passaporteCovid {
         _;
     }
 
-    // pensei em só poder cadastrar administradores se for o owner
-    modifier podeCadastrarAdministrador() {
-        require(msg.sender == owner,"Voce nao pode cadastrar um administrador.");
-        _;
-    }
-
     // Aqui pensei que só podem ver o hisotrico de documentos um administrador cadastrado pelo usuario como seu administrador
     // dentro de um periodo de uma hora ou o proprio usuario.
     modifier podeGetDocumentos(address cidadao, uint timestamp) {
@@ -100,9 +94,9 @@ contract passaporteCovid {
 
     // O endereço cria no ap com web3 (web3.eth.accounts.create();)
     // Cadastra um administrador (botei ativo como parametro, mas na pratica vai passar sempre true)
-    function cadastrarAdministrador(address admin, string calldata cfm, bool ativo) external podeCadastrarAdministrador(){
+    function cadastrarAdministrador(string calldata cfm, bool ativo) external {
         Administrador memory newAdmin = Administrador(ativo, cfm);
-        listaAdministradores[admin] = newAdmin;
+        listaAdministradores[msg.sender] = newAdmin;
     }
 
     // Aqui cadastra um cidadao. Esse "address[](0)" é uma gambiarra que tem que fazer para inicializar um array vazio
