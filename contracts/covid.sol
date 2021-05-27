@@ -37,13 +37,6 @@ contract covid {
         owner = msg.sender;
     }
 
-    // Modifiquei tambem esse modifier para buscar na lista de administradores o sender da chamada
-    // como nao tem como saber se um endereço existe em um mapping (tecnicamente "existem" todos) uso o atcivo == true para saber se foi "criado"
-    modifier podeCadastrar() {
-        require(listaAdministradores[msg.sender].ativo == bool(true), "Voce nao pode cadastrar um cidadao.");
-        _;
-    }
-
     // mesmo que acima
     modifier podeAdicionarDocumento() {
         require(listaAdministradores[msg.sender].ativo == bool(true), "Voce nao pode adicionar documentos ao historico.");
@@ -100,9 +93,9 @@ contract covid {
     }
 
     // Aqui cadastra um cidadao. Esse "address[](0)" é uma gambiarra que tem que fazer para inicializar um array vazio
-    function cadastrarCidadao(address cidadao) external podeCadastrar(){
+    function cadastrarCidadao() external {
         Cidadao memory newCidadao = Cidadao(0, 0, true, 0, address(0), 0, new address[](0));
-        listaCidadao[cidadao] = newCidadao;
+        listaCidadao[msg.sender] = newCidadao;
     }
 
     // Adiciona ao array documentos o endereço do documento no ipfs
