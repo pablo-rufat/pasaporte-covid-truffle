@@ -18,6 +18,8 @@ contract passaporteCovid {
          uint segundaDose;
          bool cadastrado;
          uint docCount;
+         address administrador;
+         uint adminTimestamp;
          address[] documentos;
      }
 
@@ -54,9 +56,22 @@ contract passaporteCovid {
         _;
     }
 
-    // Aqui pensei que só podem ver o hisotrico de documentos um administrador ou o proprio usuario.
-    modifier podeGetDocumentos(address cidadao) {
-        require(listaAdministradores[msg.sender].ativo == bool(true) || uint(msg.sender) == uint(cidadao), "Voce nao pode ver historico.");
+    // Aqui pensei que só podem ver o hisotrico de documentos um administrador cadastrado pelo usuario como seu administrador
+    // dentro de um periodo de uma hora ou o proprio usuario.
+    modifier podeGetDocumentos(address cidadao, uint timestamp) {
+        require(listaAdministradores[msg.sender].ativo == bool(true) &&
+                msg.sender == listaCidadao[cidadao].administrador &&
+                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600 ||
+                msg.sender == cidadao, "Voce nao pode ver historico.");
+        _;
+    }
+
+    // igual que acima
+    modifier podeGetHistoricoVacinas(address cidadao, uint timestamp) {
+        require(listaAdministradores[msg.sender].ativo == bool(true) &&
+                msg.sender == listaCidadao[cidadao].administrador &&
+                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600 ||
+                msg.sender == cidadao, "Voce nao pode ver historico.");
         _;
     }
 
@@ -76,6 +91,13 @@ contract passaporteCovid {
         _;
     }
 
+    // metodo para adicionar um administrador e um timestamp no struct do cidadao.
+    // Esse admin só vai poder ver os dados do cidadao durante uma hora.
+    function permitirAdministrador(address admin, uint timestamp) external {
+        listaCidadao[msg.sender].administrador = admin;
+        listaCidadao[msg.sender].adminTimestamp = timestamp;
+    }
+
     // O endereço cria no ap com web3 (web3.eth.accounts.create();)
     // Cadastra um administrador (botei ativo como parametro, mas na pratica vai passar sempre true)
     function cadastrarAdministrador(address admin, string calldata cfm, bool ativo) external podeCadastrarAdministrador(){
@@ -85,7 +107,7 @@ contract passaporteCovid {
 
     // Aqui cadastra um cidadao. Esse "address[](0)" é uma gambiarra que tem que fazer para inicializar um array vazio
     function cadastrarCidadao(address cidadao) external podeCadastrar(){
-        Cidadao memory newCidadao = Cidadao(0, 0, true, 0, new address[](0));
+        Cidadao memory newCidadao = Cidadao(0, 0, true, 0, address(0), 0, new address[](0));
         listaCidadao[cidadao] = newCidadao;
     }
 
@@ -96,12 +118,12 @@ contract passaporteCovid {
     }
 
     // Que merda é trabalhar com arrays em solidity ein. e pra retornar elas pior
-    function getDocumentos(address cidadao) external view podeGetDocumentos(cidadao) returns (address  [] memory) {
+    function getDocumentos(address cidadao, uint timestamp) external view podeGetDocumentos(cidadao, timestamp) returns (address  [] memory) {
         return listaCidadao[cidadao].documentos;
     }
 
     // Achei que seria bom criar um metodo que retornase o timestamp da duas vacinas ao mesmo tempo em lugar de dois metodos
-    function getHistoricoDatasVacinas(address cidadao) external view returns (uint, uint) {
+    function getHistoricoDatasVacinas(address cidadao, uint timestamp) external view podeGetHistoricoVacinas(cidadao, timestamp) returns (uint, uint) {
         return (listaCidadao[cidadao].primeiraDose, listaCidadao[cidadao].segundaDose);
     }
 
