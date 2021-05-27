@@ -1,5 +1,5 @@
-const Covid = artifacts.require("./covid.sol")
+const PassaporteCovid = artifacts.require("PassaporteCovid");
 
-module.exports = function(deployer) {
-	deployer.deploy(Covid);
+module.exports = function (deployer) {
+  deployer.deploy(PassaporteCovid);
 };

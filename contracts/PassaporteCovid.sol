@@ -17,7 +17,6 @@ contract covid {
          uint primeiraDose;
          uint segundaDose;
          bool cadastrado;
-         uint docCount;
          address administrador;
          uint adminTimestamp;
          address[] documentos;
@@ -94,14 +93,13 @@ contract covid {
 
     // Aqui cadastra um cidadao. Esse "address[](0)" é uma gambiarra que tem que fazer para inicializar um array vazio
     function cadastrarCidadao() external {
-        Cidadao memory newCidadao = Cidadao(0, 0, true, 0, address(0), 0, new address[](0));
+        Cidadao memory newCidadao = Cidadao(0, 0, true, address(0), 0, new address[](0));
         listaCidadao[msg.sender] = newCidadao;
     }
 
     // Adiciona ao array documentos o endereço do documento no ipfs
     function addDocumento(address cidadao, address ipfs) external podeAdicionarDocumento() {
-        listaCidadao[cidadao].documentos[listaCidadao[cidadao].docCount] = ipfs;
-        listaCidadao[cidadao].docCount += 1;
+        listaCidadao[cidadao].documentos.push(ipfs);
     }
 
     // Que merda é trabalhar com arrays em solidity ein. e pra retornar elas pior
