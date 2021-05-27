@@ -6,7 +6,11 @@ module.exports = async function getAbi(deployer) {
   );
   const objeto = JSON.parse(response);
   await fs.writeFile(
-    __dirname + "/../../passaportecovid/src/utils/abi.json",
+    __dirname + "/../../pasaporte-covid-administrador/src/utils/abi.json",
+    JSON.stringify(objeto.abi, null, 4)
+  );
+  await fs.writeFile(
+    __dirname + "/../../pasaporte-covid-cidadao/src/utils/abi.json",
     JSON.stringify(objeto.abi, null, 4)
   );
 };

@@ -1,6 +1,6 @@
 pragma solidity 0.5.16;
 
-contract covid {
+contract PassaporteCovid {
 
     //pessoas que receberam a primeira dose
      uint32 public totalPrimeiraDose;

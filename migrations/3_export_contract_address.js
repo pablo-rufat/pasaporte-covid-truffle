@@ -10,7 +10,11 @@ module.exports = async function getAddress(deployer) {
     address,
   };
   await fs.writeFile(
-    __dirname + "/../../passaportecovid/src/utils/contractAddress.json",
+    __dirname + "/../../pasaporte-covid-administrador/src/utils/contractAddress.json",
+    JSON.stringify(escrita, null, 4)
+  );
+  await fs.writeFile(
+    __dirname + "/../../pasaporte-covid-cidadao/src/utils/contractAddress.json",
     JSON.stringify(escrita, null, 4)
   );
 };
