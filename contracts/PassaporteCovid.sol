@@ -56,7 +56,7 @@ contract PassaporteCovid {
     modifier podeGetHistoricoVacinas(address cidadao, uint timestamp) {
         require(listaAdministradores[msg.sender].ativo == bool(true) &&
                 msg.sender == listaCidadao[cidadao].administrador &&
-                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600 ||
+                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600000 ||
                 msg.sender == cidadao, "Voce nao pode ver historico.");
         _;
     }
@@ -112,13 +112,13 @@ contract PassaporteCovid {
         return (listaCidadao[cidadao].primeiraDose, listaCidadao[cidadao].segundaDose);
     }
 
-     function aplicarPrimeiraDose(uint timestamp, address cidadao) external podeAplicarPrimeiraDose(cidadao) {
+    function aplicarPrimeiraDose(uint timestamp, address cidadao) external podeAplicarPrimeiraDose(cidadao) {
          listaCidadao[cidadao].primeiraDose = timestamp;
          totalPrimeiraDose += 1;
-     }
+    }
 
-     function aplicarSegundaDose(uint timestamp, address cidadao) external podeAplicarSegundaDose(cidadao) {
+    function aplicarSegundaDose(uint timestamp, address cidadao) external podeAplicarSegundaDose(cidadao) {
          listaCidadao[cidadao].segundaDose = timestamp;
          totalSegundaDose += 1;
-     }
+    }
 }
