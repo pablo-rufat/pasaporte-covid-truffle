@@ -47,7 +47,7 @@ contract PassaporteCovid {
     modifier podeGetDocumentos(address cidadao, uint timestamp) {
         require(listaAdministradores[msg.sender].ativo == bool(true) &&
                 msg.sender == listaCidadao[cidadao].administrador &&
-                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600 ||
+                uint(timestamp) <= uint(listaCidadao[cidadao].adminTimestamp) + 3600000 ||
                 msg.sender == cidadao, "Voce nao pode ver historico.");
         _;
     }
